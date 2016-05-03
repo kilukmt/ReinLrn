@@ -55,24 +55,11 @@ public class ValueIterationPlayer extends Player
     				double currUtil = 0.0;
     				for (State neighbor : getNeighbors(mdp.getStates().get(i), mdp))
     				{
-    					currUtil += (utility.get(neighbor) * mdp.transProb(mdp.getStates().get(i), direction, neighbor));
+    					currUtil += (backupUtility.get(neighbor) * mdp.transProb(mdp.getStates().get(i), direction, neighbor));
     				}
     				utils.put(direction, currUtil);
-    				//for(int j = 0; j < mdp.getStates().size();j++)
-    				//{
-    					//double currTransProb = mdp.transProb(mdp.getStates().get(i), direction, mdp.getStates().get(j));
-    					//if(currTransProb > 0.0)
-    					//{
-    					//	currUtil += (currTransProb * backupUtility.get(mdp.getStates().get(j)))
-    					//			      + mdp.getStates().get(i).reward();
-    					//	//System.out.println(currUtil);
-    					//	utils.put(direction, currUtil);
-    					//	//sum.add(currUtil);
-    					//}
-    					
-    				//}
     			}
-    			maxUtility.put(mdp.getStates().get(i), Collections.max(utils.values()));;
+    			maxUtility.put(mdp.getStates().get(i), (Collections.max(utils.values())* mdp.getGamma()) + mdp.getStates().get(i).reward());
     		}
     	} while (getUtilityDelta(backupUtility, maxUtility) > Math.pow(10, -3));
     	return maxUtility;
@@ -86,24 +73,24 @@ public class ValueIterationPlayer extends Player
 	 * @param mdp -The Markov Decision Process.
 	 * @return state_utility -The utility/expected reward of a given state.
 	 */
-	private Double getStateUtility(State state, MarkovDecisionProcess mdp) {
-		//Every state has four directions associated with it. 
-		//Each direction is associated with an expected discounted utility. 
-		Double state_utility;
-		HashMap<String,Double> expected_discount_utility = new HashMap<String,Double>();
-		
-		for (String dir : mdp.getActions()) {
-			double EDU = 0.0;
-			for (State neighbor : getNeighboringStates(state, mdp)) {
-				EDU += (utility.get(neighbor) * mdp.transProb(state, dir, neighbor));
-				//EDU += utility.get(neighbor);
-			}
-			expected_discount_utility.put(dir, EDU);
-		}
-		//return the state's utility as defined in AIMA: 17.2.1
-		state_utility = (Collections.max(expected_discount_utility.values()) * mdp.getGamma()) + state.reward();
-		return state_utility;
-	}
+//	private Double getStateUtility(State state, MarkovDecisionProcess mdp) {
+//		//Every state has four directions associated with it. 
+//		//Each direction is associated with an expected discounted utility. 
+//		Double state_utility;
+//		HashMap<String,Double> expected_discount_utility = new HashMap<String,Double>();
+//		
+//		for (String dir : mdp.getActions()) {
+//			double EDU = 0.0;
+//			for (State neighbor : getNeighboringStates(state, mdp)) {
+//				EDU += (utility.get(neighbor) * mdp.transProb(state, dir, neighbor));
+//				//EDU += utility.get(neighbor);
+//			}
+//			expected_discount_utility.put(dir, EDU);
+//		}
+//		//return the state's utility as defined in AIMA: 17.2.1
+//		state_utility = (Collections.max(expected_discount_utility.values()) * mdp.getGamma()) + state.reward();
+//		return state_utility;
+//	}
     
     /**
      * finds the difference between the U' and U
